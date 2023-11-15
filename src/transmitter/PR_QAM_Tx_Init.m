@@ -41,7 +41,7 @@ bits = de2bi(msgSet, 7, 'left-msb')';
 SP.MessageBits = bits(:);
 
 % Pluto transmitter parameters
-SP.PlutoCenterFrequency      = 1333e6;
+SP.PlutoCenterFrequency      = 2.41e9;
 SP.PlutoGain                 = 0;
 SP.PlutoFrontEndSampleRate   = SP.Fs;
 SP.PlutoFrameLength          = SP.Interpolation * SP.FrameSize;

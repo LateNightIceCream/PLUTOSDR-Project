@@ -1,5 +1,4 @@
 addpath(genpath("./common/"))
-addpath(genpath("./util/"))
 addpath(genpath("./receiver/"))
 addpath(genpath("./transmitter/"))
 
