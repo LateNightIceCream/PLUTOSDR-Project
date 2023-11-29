@@ -1,3 +1,10 @@
+% Tx and Rx oscillators likely have a frequency offset between them
+%   we can determine that offset by transmitting a sinusoid
+%   and looking at the Rx-spectrum, then adjust the center frequency upward
+%   or downward
+
+
+
 %% Frequency Correction for ADALM-PLUTO Radio
 %
 % The FrequencyCorrection property specifies the parts-per-million change

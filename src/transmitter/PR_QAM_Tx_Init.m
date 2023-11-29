@@ -3,7 +3,7 @@ function SP = PR_QAM_Tx_Init
 
 %% General simulation parameters
 SP.Rsym = 0.2e6;             % Symbol rate in Hertz
-SP.ModulationOrder = 16;      % QPSK alphabet size
+SP.ModulationOrder = 4;      % QPSK alphabet size
 SP.SizeFieldLength = 16; % length in bits of the frame's size field
 SP.Interpolation = 7;        % Interpolation factor
 SP.Decimation = 1;           % Decimation factor

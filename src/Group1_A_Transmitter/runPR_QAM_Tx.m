@@ -1,22 +1,22 @@
-function runPlutoradioQPSKTransmitter(SP_Tx)
+function runPR_QAM_Tx(SP_Tx)
 %#codegen
 
 %   Copyright 2017 The MathWorks, Inc.
 
-persistent hTx radio
-if isempty(hTx)
+%persistent hTx radio
+%if isempty(hTx)
     % Initialize the components
     % Create and configure the transmitter System object
-    hTx = QPSKTransmitter(...
-        'UpsamplingFactor',             SP_Tx.Interpolation, ...
-        'RolloffFactor',                SP_Tx.RolloffFactor, ...
-        'RaisedCosineFilterSpan',       SP_Tx.RaisedCosineFilterSpan, ...
-        'MessageBits',                  SP_Tx.MessageBitst, ...
-        'MessageLength',                SP_Tx.MessageLength, ...
-        'NumberOfMessage',              SP_Tx.NumberOfMessage, ...
-        'ScramblerBase',                SP_Tx.ScramblerBase, ...
-        'ScramblerPolynomial',          SP_Tx.ScramblerPolynomial, ...
-        'ScramblerInitialConditions',   SP_Tx.ScramblerInitialConditions);
+    %hTx = QPSKTransmitter(...
+    %    'UpsamplingFactor',             SP_Tx.Interpolation, ...
+    %    'RolloffFactor',                SP_Tx.RolloffFactor, ...
+    %    'RaisedCosineFilterSpan',       SP_Tx.RaisedCosineFilterSpan, ...
+    %    'MessageBits',                  SP_Tx.MessageBitst, ...
+    %    'MessageLength',                SP_Tx.MessageLength, ...
+    %    'NumberOfMessage',              SP_Tx.NumberOfMessage, ...
+    %    'ScramblerBase',                SP_Tx.ScramblerBase, ...
+    %    'ScramblerPolynomial',          SP_Tx.ScramblerPolynomial, ...
+    %    'ScramblerInitialConditions',   SP_Tx.ScramblerInitialConditions);
     
     % Create and configure the Pluto System object.
     radio = sdrtx('Pluto');
@@ -25,7 +25,7 @@ if isempty(hTx)
     radio.BasebandSampleRate    = SP_Tx.PlutoFrontEndSampleRate;
     radio.SamplesPerFrame       = SP_Tx.PlutoFrameLength;
     radio.Gain                  = SP_Tx.PlutoGain;
-end
+%end
 
 currentTime = 0;
 disp('Transmission has started')
@@ -33,10 +33,10 @@ disp('Transmission has started')
     % Transmission Process
 while currentTime < SP_Tx.StopTime
     % Bit generation, modulation and transmission filtering
-    data = step(hTx);
+    %data = step(hTx);
 
     % Data transmission
-    step(radio, data);
+    step(radio, SP_Tx.tx_symbols);
 
     % Update simulation time
     currentTime = currentTime+SP_Tx.FrameTime;
@@ -46,7 +46,6 @@ if currentTime ~= 0
     disp('Transmission has ended')
 end    
 
-release(hTx);
 release(radio);
 
 end
