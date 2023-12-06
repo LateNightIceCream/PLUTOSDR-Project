@@ -1,0 +1,28 @@
+% this is used to record the raw signal at the receiver
+% and save it to a file for later use
+
+addpath(genpath("../common/"))
+addpath(genpath("../receiver/"))
+addpath(genpath("../transmitter/"))
+
+
+% run the transmitter
+
+prmQAMTransmitter = PR_QAM_Tx_Init;
+prmQAMTransmitter = QAMBitsGenerator(prmQAMTransmitter);
+
+
+% run the receiver
+
+rx = sdrrx('Pluto', ...
+           'RadioID', 'usb:0')
+
+% RadioID: 'usb:0'
+%            CenterFrequency: 2.4000e+09
+%                 GainSource: 'AGC Slow Attack'
+%             ChannelMapping: 1
+%         BasebandSampleRate: 1000000
+%             OutputDataType: 'int16'
+%            SamplesPerFrame: 20000
+%            EnableBurstMode: false
+%     ShowAdvancedProperties: false

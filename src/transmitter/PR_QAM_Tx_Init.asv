@@ -20,7 +20,7 @@ SP.MessageLength   = length(SP.Message) + 5;                % 'Hello world 000\n
 SP.NumberOfMessage = 100;                                          % Number of messages in a frame
 SP.SizeFieldLength = 16;                                    % length in bits of the frame's size field
 SP.PayloadLength   = SP.NumberOfMessage * SP.MessageLength * 7; % 7 bits per characters
-SP.FrameSize       = (SP.HeaderLength + SP.SizeFieldLength + SP.PayloadLength) ...
+SP.FrameSize       = (SP.HeaderLength + SP.PayloadLength) ...
     / log2(SP.ModulationOrder);                                    % Frame size in symbols
 SP.FrameTime       = SP.Tsym*SP.FrameSize;
 
