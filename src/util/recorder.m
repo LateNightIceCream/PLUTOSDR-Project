@@ -7,30 +7,32 @@ addpath(genpath("../transmitter/"))
 
 close all;
 
-
-% run the transmitter
-
-prmQAMTransmitter = PR_QAM_Tx_Init;
-prmQAMTransmitter = QAMBitsGenerator(prmQAMTransmitter);
+SP = PR_QAM_Tx_Init;
+record_signal(SP, 0.0, 5)
 
 
-% run the receiver
+function record_signal(SP_Tx, fc_correction, duration)
+    % run the transmitter
 
-rx_center_frequency  = prmQAMTransmitter.PlutoCenterFrequency; % might need offset
-rx_sample_rate       = prmQAMTransmitter.PlutoFrontEndSampleRate;
-rx_samples_per_frame = prmQAMTransmitter.PlutoFrameLength;
-
-rx = sdrrx('Pluto', ...
+    rx_center_frequency  = SP_Tx.PlutoCenterFrequency + fc_correction; % might need offset
+    rx_sample_rate       = SP_Tx.PlutoFrontEndSampleRate;
+    rx_samples_per_frame = SP_Tx.PlutoFrameLength;
+    
+    % run the receiver
+    
+    rx = sdrrx('Pluto', ...
            'RadioID', 'usb:0', ...
            'CenterFrequency', rx_center_frequency, ...
            'BasebandSampleRate', rx_sample_rate, ...
            'SamplesPerFrame', rx_samples_per_frame)
 
-filename = get_filename(rx_center_frequency, rx_sample_rate, rx_samples_per_frame);
-       
-capture(rx,5,'Seconds', 'Filename', filename);
-       
-release(rx);
+    filename = get_filename(rx_center_frequency, rx_sample_rate, rx_samples_per_frame);
+
+    capture(rx, duration, 'Seconds', 'Filename', filename);
+
+    release(rx);
+    
+end
 
 
 function filename = get_filename(Fc, Fs, SpF)
