@@ -1,12 +1,14 @@
-function [SP, rx] = frequency_offset_receive(SP)
+function [SP, rx, sa] = frequency_offset_receive(SP)
 
     % Set up the receiver
     % Use the default value of 0 for FrequencyCorrection, which corresponds to
     % the factory-calibrated condition
     sampleRate = SP.PlutoFrontEndSampleRate;
     centerFreq = SP.PlutoCenterFrequency;
-    numSamples = SP.PlutoFrameLength; % 1024 * 1024
+    numSamples = 1024*1024; % 1024 * 1024
  
+    fRef = 80e3;
+    
     rx = sdrrx('Pluto', 'RadioID', 'usb:0', 'CenterFrequency', centerFreq, ...
                'BasebandSampleRate', sampleRate, 'SamplesPerFrame', numSamples, ...
                'OutputDataType', 'double', 'ShowAdvancedProperties', true);
@@ -19,7 +21,7 @@ function [SP, rx] = frequency_offset_receive(SP)
     disp(['Capture signal and observe the frequency offset' newline])
     % recording!
     receivedSig = rx(); 
-    save("rx_signal_1", receivedSig)
+    %save("rx_signal_1", receivedSig)
 
     % Find the tone that corresponds to the 80 kHz transmitted tone
     y = fftshift(abs(fft(receivedSig)));

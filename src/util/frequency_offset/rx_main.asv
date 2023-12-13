@@ -1,6 +1,0 @@
-
-addpath(genpath("../../transmitter/"))
-
-SP_Rx = PR_QAM_Tx_Init
-
-frequency_offset_receive();
