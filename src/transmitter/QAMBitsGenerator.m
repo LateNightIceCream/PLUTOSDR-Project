@@ -26,8 +26,9 @@ function SP = QAMBitsGenerator(SP)
     % The padding goes after the message
     % When using binary inputs, the number of rows in the input must be 
     % an integer multiple of the number of bits per symbol.
-    n_pad_bits = rem(size(scrambledMsgBits, 1) + size(frame', 1), log2(SP.ModulationOrder));
-    pad_bits = zeros(n_pad_bits, 1)';
+    %n_pad_bits = rem(size(scrambledMsgBits, 1) + size(frame', 1), log2(SP.ModulationOrder));
+    %pad_bits = zeros(n_pad_bits, 1)';
+    pad_bits = calc_padding_bits(size(scrambledMsgBits, 1) + size(frame', 1), SP.ModulationOrder);
     frame = [frame, scrambledMsgBits', pad_bits];
     
     %% Modulation (generate symbols)fiesl
@@ -42,5 +43,6 @@ function SP = QAMBitsGenerator(SP)
                 'OutputSamplesPerSymbol', SP.Interpolation);
             
     SP.tx_symbols = tx_filter(SP.qam_symbols);
+    SP.F
     
 end
