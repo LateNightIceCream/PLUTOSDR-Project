@@ -20,8 +20,9 @@ SP.HeaderLength    = SP.BarkerLength * 2;                   % Duplicate 2 Barker
 SP.Message         = 'Hello world';
 SP.MessageLength   = length(SP.Message) + 5;                % 'Hello world 000\n'...
 SP.NumberOfMessage = 100;                                          % Number of messages in a frame
+SP.SizeFieldLength = 16;                                    % length in bits of the frame's size field
 SP.PayloadLength   = SP.NumberOfMessage * SP.MessageLength * 7; % 7 bits per characters
-SP.FrameSize       = (SP.HeaderLength + SP.PayloadLength) ...
+SP.FrameSize       = (SP.HeaderLength + SP.SizeFieldLength + SP.PayloadLength + calc_padding_bits(SP.HeaderLength + SP.SizeFieldLength + SP.PayloadLength, SP.ModulationOrder)) ...
     / log2(SP.ModulationOrder);                                    % Frame size in symbols
 SP.FrameTime       = SP.Tsym*SP.FrameSize;
 
@@ -50,19 +51,10 @@ SP.TimingErrorDetectorGain       = 2.7*2*K*A^2+2.7*2*K*A^2;
 SP.PreambleDetectorThreshold     = 0.8;
 
 
-%% Message generation
-msgSet = zeros(100 * SP.MessageLength, 1); 
-for msgCnt = 0 : SP.NumberOfMessage - 1
-    msgSet(msgCnt * SP.MessageLength + (1 : SP.MessageLength)) = ...
-        sprintf('%s %03d\n', SP.Message, msgCnt);
-end
-bits = de2bi(msgSet, 7, 'left-msb')';
-SP.MessageBits = bits(:);
-
-% Pluto transmitter parameters
-SP.PlutoCenterFrequency      = 1333e6;
+% Pluto receiver parameters
+SP.PlutoCenterFrequency      = 2.2e9;
 SP.PlutoGain                 = 0;
-SP.PlutoFrontEndSampleRate   = SP.Fs;
+SP.PlutoFrontEndSampleRate   = 1.6e6;
 SP.PlutoFrameLength          = SP.Interpolation * SP.FrameSize;
 
 % Simulation Parameters

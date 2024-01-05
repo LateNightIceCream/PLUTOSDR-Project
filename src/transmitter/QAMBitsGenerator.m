@@ -43,6 +43,5 @@ function SP = QAMBitsGenerator(SP)
                 'OutputSamplesPerSymbol', SP.Interpolation);
             
     SP.tx_symbols = tx_filter(SP.qam_symbols);
-    SP.F
     
 end

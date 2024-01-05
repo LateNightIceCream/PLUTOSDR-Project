@@ -1,11 +1,13 @@
 
 addpath(genpath("../../transmitter/"))
 
+close all;
+
 SP = PR_QAM_Tx_Init
 
 % send the signal for frequency offset calibration
 disp("Transmitting offset calibration signals...")
-[SP, tx] = frequency_offset_transmit(SP, 80e3); % we cannot release the tx structure because it changes the frequency offset of the hardware for some reason
+[SP, tx] = frequency_offset_transmit(SP, 'ip:192.168.2.3', 15.0); % we cannot release the tx structure because it changes the frequency offset of the hardware for some reason
 disp("Offset calibration finished...")
 
 % Problem: setting up Tx with some number of samples per frame

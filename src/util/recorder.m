@@ -7,26 +7,13 @@ addpath(genpath("../transmitter/"))
 
 close all;
 
-SP = PR_QAM_Tx_Init;
-record_signal(SP, 0.0, 5)
+%SP = PR_QAM_Tx_Init;
+%record_signal(SP, 0.0, 5)
 
 
-function record_signal(SP_Tx, fc_correction, duration)
-    % run the transmitter
+function record_signal(rx, duration)
 
-    rx_center_frequency  = SP_Tx.PlutoCenterFrequency + fc_correction; % might need offset
-    rx_sample_rate       = SP_Tx.PlutoFrontEndSampleRate;
-    rx_samples_per_frame = SP_Tx.PlutoFrameLength;
-    
-    % run the receiver
-    
-    rx = sdrrx('Pluto', ...
-           'RadioID', 'usb:0', ...
-           'CenterFrequency', rx_center_frequency, ...
-           'BasebandSampleRate', rx_sample_rate, ...
-           'SamplesPerFrame', rx_samples_per_frame)
-
-    filename = get_filename(rx_center_frequency, rx_sample_rate, rx_samples_per_frame);
+    filename = get_filename(rx.CenterFrequency, rx.BasebandSampleRate, rx.SamplesPerFrame);
 
     capture(rx, duration, 'Seconds', 'Filename', filename);
 
