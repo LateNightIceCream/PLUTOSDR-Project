@@ -49,7 +49,7 @@ classdef Receiver < RadioBase
         %% Receive frequency offset and calibrate
         function receive_frequency_offset(obj)
             if isempty(obj.Radio)
-                error("Radio object not initialized. Call init_radio(...) first.");
+                error(obj.ERR_RADIO_NOT_INIT);
             end
 
             obj.OffsetCalibrationFinished = false;
@@ -84,20 +84,37 @@ classdef Receiver < RadioBase
                      'FrequencyCorrection of the receiver was set to %.4f'], ...
                      fReceived/1000, obj.Radio.FrequencyCorrection);
                  
-           obj.OffsetCalibrationFinished = true;
-           info(obj.Radio)     
+            obj.OffsetCalibrationFinished = true;
+            info(obj.Radio)     
         end
         
         
-        %% Receive message (basically just save the frame)
-        function receive_message(obj)
-            if ~obj.OffsetcalibrationFinished
+        %% Receive frame with given duration
+        function data = receive(obj, duration, save_data)
+            if ~obj.OffsetCalibrationFinished
                 error("Please run the offset calibration first");
             end
+
+            disp("Now receiving message frame...");
+
+            %% Receive and Visualize Signal
+            [data, mdata] = capture(obj.Radio, duration, 'Seconds');
             
-            
+            disp(mdata)
+
+            if save_data == true
+                filename = obj.get_filename(obj.Radio.CenterFrequency, ...
+                                            obj.Radio.BasebandSampleRate, ...
+                                            obj.Radio.SamplesPerFrame);
+                save(filename, 'data')
+            end
+
         end
         
+        %% ignore this
+        function test_blep(obj)
+            obj.get_filename()
+        end
         
         %% Setters
         
@@ -109,25 +126,18 @@ classdef Receiver < RadioBase
     
     
     methods (Access=private)
+        function filename = get_filename(obj)
+            if isempty(obj.Radio)
+                error(obj.ERR_RADIO_NOT_INIT)
+            end
+            Fc = obj.Radio.CenterFrequency;
+            Fs = obj.Radio.BasebandSampleRate;
+            SpF = obj.Radio.SamplesPerFrame;
+            date_fmt = "yyyy_MM_dd[hh:mm:ss]";
+            now = string(datetime("now", 'TimeZone', 'UTC'), date_fmt);
+            %filename = join([string(Fc), string(Fs), string(SpF)], '_');
+            filename = sprintf('%s_Fc[%d]_Fs[%d]_SpF[%d].bb', now, Fc, Fs, SpF);
+        end
     end
     
 end
-
-% 
-% function record_signal(rx, duration)
-% 
-%     filename = get_filename(rx.CenterFrequency, rx.BasebandSampleRate, rx.SamplesPerFrame);
-% 
-%     capture(rx, duration, 'Seconds', 'Filename', filename);
-% 
-%     release(rx);
-%     
-% end
-% 
-% 
-% function filename = get_filename(Fc, Fs, SpF)
-%     date_fmt = "yyyy_MM_dd[hh:mm:ss]";
-%     now = string(datetime("now", 'TimeZone', 'UTC'), date_fmt);
-%     filename = join([string(Fc), string(Fs), string(SpF)], '_');
-%     filename = sprintf('%s_Fc[%d]_Fs[%d]_SpF[%d].bb', now, Fc, Fs, SpF);
-% end

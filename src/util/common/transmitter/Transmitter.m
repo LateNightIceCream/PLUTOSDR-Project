@@ -55,7 +55,7 @@ classdef Transmitter < RadioBase
         function transmit_message(obj, duration_sec)
             
             if isempty(obj.Radio)
-                error("Radio object not initialized. Call init_radio(...) first.");
+                error(obj.ERR_RADIO_NOT_INIT);
             end
             
             if isempty(obj.Symbols)
@@ -89,7 +89,7 @@ classdef Transmitter < RadioBase
         function transmit_frequency_offset_signals(obj, duration_sec)
             
             if isempty(obj.Radio)
-                error("Radio object not initialized. Call init_radio(...) first.");
+                error(obj.ERR_RADIO_NOT_INIT);
             end
             
             sampleRate = obj.Fs;

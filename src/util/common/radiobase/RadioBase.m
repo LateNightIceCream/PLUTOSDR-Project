@@ -6,7 +6,7 @@ classdef RadioBase < handle
         Rsym = 0.2e6;             % Symbol rate in Hertz
         ModulationOrder = 4;      % QPSK alphabet size
         Interpolation = 7;        % Interpolation factor, not necessarily "common", but here it is.
-        Decimation = 1;           % Decimation factor
+        Decimation = 7;           % Decimation factor
         
         %% Frame Specifications
         BarkerCode = [+1 +1 +1 +1 +1 -1 -1 +1 +1 -1 +1 -1 +1]; % Bipolar Barker Code
@@ -24,6 +24,10 @@ classdef RadioBase < handle
         
         %% Frequqency Offset Parameters
         FRef = 80e3; % frequency used for offset calibration
+    end
+    
+    properties(Constant, Access=protected)
+        ERR_RADIO_NOT_INIT = "Radio object not initialized. Call init_radio(...) first.";
     end
     
     properties(Dependent)
@@ -62,5 +66,6 @@ classdef RadioBase < handle
             ubc = ((obj.BarkerCode + 1) / 2)';
             Header = (repmat(ubc,2,1))';
         end
+        
     end
 end
