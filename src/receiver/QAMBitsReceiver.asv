@@ -1,8 +1,0 @@
-function SP = QAMBitsReceiver(rx_param, bits)
-    %% Rx-filter
-
-    %% Demodulate
-
-    %% ...
-    
-end
