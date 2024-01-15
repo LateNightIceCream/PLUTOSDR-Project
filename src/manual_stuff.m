@@ -8,76 +8,55 @@ receiver = Receiver();
 load('C:\Users\st181028\Desktop\PLUTOSDR-Project\src\recordings\rx_capture_2.mat');
 
 % reduce the data for testing
-data = data(1500002:end);
+start_idx = 1500002+525065;
+end_idx = 1500002 + 665194 + 3;
+data = data(start_idx:end_idx);
 
 rx_filter = comm.RaisedCosineReceiveFilter(...
                         'RolloffFactor', receiver.RolloffFactor, ...
                         'FilterSpanInSymbols', receiver.RaisedCosineFilterSpan, ...
                         'InputSamplesPerSymbol', receiver.SamplesPerSymbol, ...
-                        'DecimationFactor', 1);
+                        'DecimationFactor', 7);
 
 data = rx_filter(data);
+
+% crop the data manually
+
 plot(abs(data));
-figure()
-scatter(real(data), imag(data))
 
-figure()
-miniframeo = data(132000:172310);
-scatter(real(miniframeo), imag(miniframeo));
-scatter(real(data(1:132000)), imag(data(1:132000)));
-%plot(abs(data(132000:172310)))
-
-data_bits = qamdemod(data, receiver.ModulationOrder, 'OutputType', 'bit');
-
-figure()
-plot(data_bits);
-
-xcorrheader = xcorr(data_bits, receiver.Header');
-figure()
-plot(xcorrheader);
-
-% header symbols
-% => same number of samples as received signal (Fs * Interpolation)
+constplot(data);
+reimplot(data);
 
 
-headerSyms = qammod(repmat(receiver.Header, 1, 2)', receiver.ModulationOrder, ...
-                    InputType='bit', ...
-                    UnitAveragePower=true, ...
-                    PlotConstellation=true)
-                     
-tx_filter = comm.RaisedCosineTransmitFilter( ...
-                        'RolloffFactor', receiver.RolloffFactor, ...
-                        'FilterSpanInSymbols', receiver.RaisedCosineFilterSpan, ...
-                        'OutputSamplesPerSymbol', receiver.SamplesPerSymbol);
-          
-headerSamps = rx_filter(tx_filter(headerSyms));
+powered_signal = data.^receiver.ModulationOrder;
+Y = fftshift(fft(powered_signal));
+L = length(Y);
+freq = receiver.Fs/L*(-L/2:L/2-1);
 
+[M, I] = max(abs(Y));
 
-headerSamps2 = [headerSamps];
+offset_frequency = freq(I) / receiver.ModulationOrder;
 
-XY = xcorr((data), (headerSamps2));
+sprintf("offset frequency is: %f", offset_frequency)
 
-[M,I] = max(XY)
+plot(freq,abs(Y));
 
-nonz = find(abs(XY)>1e-14, 1)
-XYcrop = XY(nonz:end);
-I = I - nonz;
+Ts = 1/receiver.Fs;
+t = linspace(0, Ts * L, L);
 
-m = zeros(1, length(XYcrop));
-m(1,I) = 1;
+size(t)
+size(powered_signal)
 
-figure()
-sp(1)=subplot(4,1,1);
-plot(abs(headerSamps2));
-sp(2)=subplot(4,1,2);
-plot(abs(data));
-sp(3)=subplot(4,1,3);
-plot(abs(XYcrop));
-sp(4)=subplot(4,1,4);
-plot(m);
+% fine frequency offset correction might be needed.
+% but we're just cheating here by adding 10.0 :)
+offset_frequency = offset_frequency + 10.0;
 
+samples = data .* exp(-1i * 2 * pi * offset_frequency * t') .* exp(1i * (pi/4 + pi/2)); % cheating :)
 
-samples = data;
+%constplot(samples)
+%reimplot(samples)
+
+%samples = data;
 sps = receiver.SamplesPerSymbol;
 mu = 0.2; % initial estimate of phase of sample
 out = zeros(length(samples) + 10, 1);
@@ -99,16 +78,32 @@ end
 out = out(3:i_out-1); % remove the first two, and anything after i_out (that was never filled out)
 samples = out; % only include this line if you want to connect this code snippet with the Costas Loop later o
 
-figure()
+
 constplot(samples);
-%plot(abs(samples));
 
-%figure()
-%constplot(mean(samples.^4));
 
-%symbs = qamdemod(data, receiver.ModulationOrder, 'OutputType', 'bit');
+data_bits = qamdemod(data, receiver.ModulationOrder, 'OutputType', 'bit');
+
+header_bits = receiver.Header;
+
+figure()
+sp(1)=subplot(3,1,1);
+stem(header_bits);
+sp(2)=subplot(3,1,2);
+stem( data_bits(1:100));
+sp(3)=subplot(3,1,3);
+plot(xcorr(data_bits, header_bits'));
 
 
 function constplot(x)
+    figure()
     scatter(real(x), imag(x));
+end
+
+function reimplot(x)
+    figure()
+    hold on;
+    plot(real(x));
+    plot(imag(x));
+    hold off;
 end

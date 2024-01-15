@@ -31,9 +31,10 @@ classdef RadioBase < handle
     end
     
     properties(Dependent)
-        Tsym;
-        Fs;
-        Header;
+        Tsym; % Symbol Duration
+        Fs; % Sampling Rate
+        SamplesPerSymbol;
+        Header; % Header Bits
     end
     
     properties (GetAccess=public, SetAccess=protected)
@@ -67,5 +68,10 @@ classdef RadioBase < handle
             Header = (repmat(ubc,2,1))';
         end
         
+        
+        % Samples Per Symbol
+        function SamplesPerSymbol = get.SamplesPerSymbol(obj)
+            SamplesPerSymbol = obj.Fs / obj.Rsym;
+        end
     end
 end
